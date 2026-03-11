@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>REJOUIR — Short Film Festival</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --red:        #ff1a1a;
+      --red-dim:    #cc0000;
+      --red-glow:   rgba(255, 26, 26, 0.35);
+      --red-faint:  rgba(255, 26, 26, 0.08);
+      --bg:         #050505;
+      --bg2:        #0a0a0a;
+      --glass-bg:   rgba(12, 12, 12, 0.72);
+      --glass-bdr:  rgba(255, 26, 26, 0.18);
+      --text:       #e8e0d5;
+      --muted:      #7a7060;
+      --white:      #ffffff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 17px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: .6;
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      letter-spacing: .06em;
+      line-height: 1;
+      color: var(--white);
+    }
+    .divider {
+      width: 60px; height: 2px;
+      background: var(--red);
+      box-shadow: 0 0 10px var(--red);
+      margin: 1.5rem 0 2.5rem;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px) saturate(1.3);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      border: 1px solid var(--glass-bdr);
+      border-radius: 6px;
+    }
+    .glass:hover {
+      border-color: rgba(255,26,26,.45);
+      box-shadow: 0 0 28px rgba(255,26,26,.12), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: .85rem 2.4rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .9rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      background: transparent;
+      border: 1.5px solid var(--red);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all .3s ease;
+      box-shadow: 0 0 14px var(--red-glow), inset 0 0 14px rgba(255,26,26,.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,26,26,.15), transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .btn:hover { box-shadow: 0 0 32px var(--red), 0 0 60px var(--red-glow); color: #fff; }
+    .btn:hover::before { opacity: 1; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 1.1rem 0;
+      background: rgba(5,5,5,.82);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,26,26,.1);
+      transition: background .3s;
+    }
+    nav .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: .12em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .25s;
+    }
+    .nav-links a:hover { color: var(--red); text-shadow: 0 0 12px var(--red); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span {
+      width: 24px; height: 2px;
+      background: var(--text);
+      transition: all .3s;
+      border-radius: 2px;
+    }
+
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 80px;
+    }
+
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,.18) 2px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(200,0,0,.14) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(180,0,0,.08) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(150,0,0,.07) 0%, transparent 55%),
+        linear-gradient(180deg, #050505 0%, #0d0303 50%, #050505 100%);
+    }
+
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.85) 100%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 860px; padding: 0 2rem; }
+
+    .hero-eyebrow {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      letter-spacing: .45em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
+      text-shadow: 0 0 20px var(--red);
+      animation: flicker 4s infinite;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 13vw, 10rem);
+      line-height: .9;
+      letter-spacing: .04em;
+      color: var(--white);
+      text-shadow:
+        0 0 40px rgba(255,26,26,.3),
+        0 0 80px rgba(255,26,26,.1),
+        0 2px 4px rgba(0,0,0,.9);
+      margin-bottom: .4rem;
+    }
+    .hero-title .accent { color: var(--red); text-shadow: 0 0 40px var(--red), 0 0 80px rgba(255,26,26,.5); }
+
+    .hero-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.45rem);
+      color: rgba(232,224,213,.55);
+      letter-spacing: .06em;
+      margin: 1.4rem 0 2.8rem;
+    }
+
+    @keyframes flicker {
+      0%,95%,100% { opacity: 1; }
+      96% { opacity: .4; }
+      97% { opacity: 1; }
+      98% { opacity: .6; }
+      99% { opacity: 1; }
+    }
+
+    #about { padding: 8rem 0; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .about-text p { color: rgba(232,224,213,.7); margin-bottom: 1rem; font-size: 1.05rem; }
+    .about-visual {
+      position: relative;
+      height: 320px;
+    }
+    .film-frame {
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--glass-bdr);
+      border-radius: 6px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .film-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg, transparent 0, transparent 20px,
+        rgba(255,26,26,.03) 20px, rgba(255,26,26,.03) 21px
+      );
+    }
+    .film-icon {
+      font-size: 6rem;
+      opacity: .12;
+      user-select: none;
+    }
+    .film-stat {
+      position: absolute;
+      bottom: 1.5rem; left: 1.5rem; right: 1.5rem;
+      display: flex;
+      justify-content: space-around;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: var(--red);
+      text-shadow: 0 0 20px var(--red);
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .2em;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+
+    #rules { padding: 8rem 0; background: linear-gradient(180deg, var(--bg) 0%, #0a0202 50%, var(--bg) 100%); }
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.4rem;
+      margin-top: 2.5rem;
+    }
+    .rule-card {
+      padding: 2rem;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .rule-card:hover { transform: translateY(-4px); }
+    .rule-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      color: var(--red);
+      opacity: .25;
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+    .rule-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: .5rem;
+    }
+    .rule-text { font-size: .95rem; color: rgba(232,224,213,.6); }
+
+    #submission { padding: 8rem 0; }
+    .sub-wrap {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .sub-list { list-style: none; }
+    .sub-list li {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,26,26,.07);
+      font-size: 1rem;
+      color: rgba(232,224,213,.7);
+    }
+    .sub-list li:last-child { border-bottom: none; }
+    .sub-icon {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--red-faint);
+      border: 1px solid rgba(255,26,26,.25);
+      border-radius: 3px;
+      color: var(--red);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .fee-box {
+      padding: 2.5rem;
+      text-align: center;
+      position: sticky;
+      top: 100px;
+    }
+    .fee-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      letter-spacing: .3em;
+      color: var(--muted);
+      margin-bottom: .8rem;
+    }
+    .fee-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: var(--white);
+      text-shadow: 0 0 30px rgba(255,26,26,.4);
+      line-height: 1;
+    }
+    .fee-currency { color: var(--red); }
+    .fee-note { font-size: .9rem; color: var(--muted); margin-top: .8rem; margin-bottom: 2rem; }
+
+    #awards { padding: 8rem 0; background: linear-gradient(180deg, var(--bg) 0%, #0a0202 50%, var(--bg) 100%); }
+    .awards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.4rem;
+      margin-top: 2.5rem;
+    }
+    .award-card {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: transform .3s, box-shadow .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .award-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .award-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(255,26,26,.12); }
+    .award-card:hover::before { opacity: 1; }
+    .award-trophy {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 12px rgba(255,180,0,.4));
+    }
+    .award-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: .07em;
+      color: var(--white);
+      line-height: 1.2;
+    }
+    .award-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .2em;
+      color: var(--red);
+      margin-top: .5rem;
+    }
+
+    #timeline { padding: 8rem 0; }
+    .timeline-wrap { position: relative; max-width: 700px; margin: 3rem auto 0; padding: 0 1rem; }
+    .timeline-wrap::before {
+      content: '';
+      position: absolute;
+      left: 28px;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, var(--red-dim) 15%, var(--red-dim) 85%, transparent);
+      box-shadow: 0 0 10px var(--red-glow);
+    }
+    .tl-item {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 3rem;
+      align-items: flex-start;
+    }
+    .tl-dot {
+      width: 57px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      padding-top: 4px;
+    }
+    .tl-dot-inner {
+      width: 14px; height: 14px;
+      background: var(--red);
+      border-radius: 50%;
+      box-shadow: 0 0 16px var(--red), 0 0 30px var(--red-glow);
+      border: 3px solid #050505;
+      outline: 1px solid var(--red);
+    }
+    .tl-body { flex: 1; }
+    .tl-step {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .25em;
+      color: var(--red);
+      margin-bottom: .3rem;
+    }
+    .tl-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      color: var(--white);
+      letter-spacing: .07em;
+    }
+    .tl-date { font-size: .9rem; color: var(--muted); margin-top: .2rem; }
+
+    #submit { padding: 8rem 0; text-align: center; background: linear-gradient(180deg, var(--bg) 0%, #0d0202 50%, var(--bg) 100%); }
+    .submit-inner { max-width: 680px; margin: 0 auto; padding: 0 2rem; }
+    .submit-inner p { font-size: 1.1rem; color: rgba(232,224,213,.6); margin-bottom: 3rem; }
+    .btn-large {
+      font-size: 1.05rem;
+      padding: 1.15rem 3.5rem;
+      letter-spacing: .3em;
+    }
+
+    #faq { padding: 8rem 0; }
+    .faq-list { max-width: 780px; margin: 2.5rem auto 0; }
+    .faq-item {
+      border-bottom: 1px solid rgba(255,26,26,.1);
+    }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 1.4rem 0;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: color .25s;
+    }
+    .faq-q:hover { color: var(--white); }
+    .faq-q .faq-icon {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.2rem;
+      color: var(--red);
+      transition: transform .3s;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s ease, padding .3s;
+      font-size: .98rem;
+      color: rgba(232,224,213,.6);
+      padding-bottom: 0;
+    }
+    .faq-item.open .faq-a { max-height: 200px; padding-bottom: 1.4rem; }
+
+    #contact { padding: 8rem 0; background: linear-gradient(180deg, var(--bg) 0%, #0a0202 100%); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .contact-card {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    .contact-ico { font-size: 1.8rem; margin-bottom: .4rem; }
+    .contact-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .25em;
+      color: var(--muted);
+    }
+    .contact-val {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .contact-val a { color: inherit; text-decoration: none; transition: color .25s; }
+    .contact-val a:hover { color: var(--red); }
+
+    footer {
+      border-top: 1px solid rgba(255,26,26,.1);
+      padding: 2.5rem 0;
+      background: var(--bg);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: .12em;
+      color: var(--white);
+    }
+    .footer-logo span { color: var(--red); }
+    .footer-copy {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .15em;
+      color: var(--muted);
+    }
+    .footer-socials { display: flex; gap: 1rem; }
+    .soc-link {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,26,26,.2);
+      border-radius: 3px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1rem;
+      transition: all .3s;
+    }
+    .soc-link:hover {
+      color: var(--red);
+      border-color: var(--red);
+      box-shadow: 0 0 14px var(--red-glow);
+    }
+
+    /* ── FOOTER CREDIT ────────────────────────────── */
+    .footer-credit {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .15em;
+      color: var(--muted);
+      text-align: center;
+      width: 100%;
+      margin-top: .2rem;
+    }
+    .footer-credit .credit-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: .18em;
+      color: var(--white);
+      margin-left: .4rem;
+    }
+    .footer-credit .credit-brand span { color: var(--red); }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(5,5,5,.97);
+        backdrop-filter: blur(20px);
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        z-index: 999;
+      }
+      .nav-links.open a { font-size: 1rem; }
+
+      .about-grid,
+      .sub-wrap { grid-template-columns: 1fr; }
+      .about-visual { height: 220px; }
+      .fee-box { position: static; }
+      .timeline-wrap::before { left: 22px; }
+      .tl-dot { width: 45px; }
+      .footer-inner { flex-direction: column; align-items: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="#hero" class="nav-logo">REJ<span>◉</span>UIR</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#rules">Rules</a></li>
+      <li><a href="#submission">Submit</a></li>
+      <li><a href="#awards">Awards</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">✦ 2026 Edition ✦</div>
+    <h1 class="hero-title">
+      REJ<span class="accent">◉</span>UIR<br>
+      <span style="font-size:.38em; letter-spacing:.18em; color:rgba(255,255,255,.5);">SHORT FILM FESTIVAL</span>
+    </h1>
+    <p class="hero-sub">"Where Stories Become Cinema"</p>
+    <a href="#submission" class="btn">Submit Your Film</a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p class="section-label">// About the Festival</p>
+        <h2 class="section-title">A Celebration of<br>Independent Cinema</h2>
+        <div class="divider"></div>
+        <p>REJOUIR Short Film Festival is an annual celebration dedicated to the power of short-form storytelling. Born from a love of independent cinema, the festival provides a platform for emerging filmmakers to showcase their vision, craft, and voice to audiences who matter.</p>
+        <p>We believe every story deserves to be seen. REJOUIR invites college filmmakers from across the country to step behind the lens, challenge conventions, and create work that lingers long after the lights come up.</p>
+        <p>From intimate dramas to surreal vignettes — every genre, every language, every perspective is welcome here.</p>
+      </div>
+      <div class="about-visual">
+        <div class="film-frame glass">
+          <div class="film-icon">🎬</div>
+          <div class="film-stat">
+            <div class="stat-item">
+              <div class="stat-num">15<span style="font-size:1.2rem">+</span></div>
+              <div class="stat-lbl">Colleges</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">6</div>
+              <div class="stat-lbl">Award Categories</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">∞</div>
+              <div class="stat-lbl">Stories to Tell</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">// Rules &amp; Eligibility</p>
+      <h2 class="section-title">Know Before You Shoot</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="rules-grid">
+      <div class="rule-card glass reveal">
+        <div class="rule-num">01</div>
+        <div class="rule-title">College Students Only</div>
+        <p class="rule-text">The festival is open exclusively to currently enrolled undergraduate or postgraduate college students. Valid student ID will be required during registration.</p>
+      </div>
+      <div class="rule-card glass reveal">
+        <div class="rule-num">02</div>
+        <div class="rule-title">Inter-College Teams Welcome</div>
+        <p class="rule-text">Teams may include members from different colleges. Collaborative spirit is celebrated here — cross-campus creativity is strongly encouraged.</p>
+      </div>
+      <div class="rule-card glass reveal">
+        <div class="rule-num">03</div>
+        <div class="rule-title">Maximum 15 Minutes</div>
+        <p class="rule-text">Films must not exceed 15 minutes in total runtime, including title cards and credits. Films exceeding the limit will be disqualified from judging.</p>
+      </div>
+      <div class="rule-card glass reveal">
+        <div class="rule-num">04</div>
+        <div class="rule-title">Open Theme</div>
+        <p class="rule-text">No prescribed theme. Tell the story you want to tell. Every genre, format, and narrative structure is welcome — experimental, documentary, fiction.</p>
+      </div>
+      <div class="rule-card glass reveal">
+        <div class="rule-num">05</div>
+        <div class="rule-title">Original Films Only</div>
+        <p class="rule-text">Submitted films must be original works created by the submitting team. No adaptations of copyrighted material without written permission. Plagiarism results in immediate disqualification.</p>
+      </div>
+      <div class="rule-card glass reveal">
+        <div class="rule-num">06</div>
+        <div class="rule-title">One Entry Per Team</div>
+        <p class="rule-text">Each team may submit only one film. However, individual members may be part of separate teams with distinct films. Quality over quantity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="submission">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">// Submission Guidelines</p>
+      <h2 class="section-title">What We Need From You</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="sub-wrap">
+      <ul class="sub-list reveal">
+        <li>
+          <span class="sub-icon">01</span>
+          <div><strong style="color:var(--white)">Film Title</strong><br>The official title of your short film as it should appear in all festival materials and credits.</div>
+        </li>
+        <li>
+          <span class="sub-icon">02</span>
+          <div><strong style="color:var(--white)">Director Name(s)</strong><br>Full name(s) of the director(s). This will be used for award certificates and all official communications.</div>
+        </li>
+        <li>
+          <span class="sub-icon">03</span>
+          <div><strong style="color:var(--white)">College Name</strong><br>The name of your institution as registered with your university or affiliation board.</div>
+        </li>
+        <li>
+          <span class="sub-icon">04</span>
+          <div><strong style="color:var(--white)">Film Synopsis</strong><br>A compelling synopsis of no more than 150 words that captures the soul of your film — no spoilers required.</div>
+        </li>
+        <li>
+          <span class="sub-icon">05</span>
+          <div><strong style="color:var(--white)">Private YouTube Link</strong><br>Upload your film as an unlisted video on YouTube and submit the link. Do not make the film public before the screening announcement.</div>
+        </li>
+      </ul>
+      <div class="fee-box glass reveal">
+        <p class="fee-label">Entry Fee</p>
+        <div class="fee-amount"><span class="fee-currency">₹</span>600</div>
+        <p class="fee-note">UPI payment <br>Per film submission.<br>Payment details will be shared via confirmation email.</p>
+        <a href="#submit" class="btn" style="width:100%; text-align:center; display:block;">Submit Now →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="awards">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <p class="section-label">// Awards &amp; Recognition</p>
+      <h2 class="section-title">Conquer the Day</h2>
+      <div class="divider" style="margin: 1.5rem auto 2.5rem"></div>
+    </div>
+    <div class="awards-grid">
+      <div class="award-card glass reveal">
+        <div class="award-trophy">🏆</div>
+        <div class="award-name">Best Short Film</div>
+        <div class="award-tag">// Grand Prize</div>
+      </div>
+      <div class="award-card glass reveal">
+        <div class="award-trophy">🎬</div>
+        <div class="award-name">Best Director</div>
+        <div class="award-tag">// Vision &amp; Craft</div>
+      </div>
+      <div class="award-card glass reveal">
+        <div class="award-trophy">🎭</div>
+        <div class="award-name">Best Actor</div>
+        <div class="award-tag">// Performance</div>
+      </div>
+      <div class="award-card glass reveal">
+        <div class="award-trophy">📷</div>
+        <div class="award-name">Best Cinematography</div>
+        <div class="award-tag">// Visual Language</div>
+      </div>
+      <div class="award-card glass reveal">
+        <div class="award-trophy">✂️</div>
+        <div class="award-name">Best Editing</div>
+        <div class="award-tag">// Rhythm &amp; Flow</div>
+      </div>
+      <div class="award-card glass reveal">
+        <div class="award-trophy">❤️</div>
+        <div class="award-name">Audience Choice Award</div>
+        <div class="award-tag">// People's Favourite</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="timeline">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <p class="section-label">// Festival Timeline</p>
+      <h2 class="section-title">Mark Your Calendar</h2>
+      <div class="divider" style="margin: 1.5rem auto 0"></div>
+    </div>
+    <div class="timeline-wrap">
+      <div class="tl-item reveal">
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-body">
+          <div class="tl-step">PHASE 01</div>
+          <div class="tl-title">Submissions Open Now</div>
+          <div class="tl-date">Registration portal goes live. Entry fee payments accepted.</div>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-body">
+          <div class="tl-step">PHASE 02</div>
+          <div class="tl-title">Submission Deadline - 26/03/2026</div>
+          <div class="tl-date">Last day to submit your film link and complete payment. No extensions.</div>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-body">
+          <div class="tl-step">PHASE 03</div>
+          <div class="tl-title">Official Selection Announcement - 26/03/2026</div>
+          <div class="tl-date">Selected films notified via email. Programme announced on our Instagram.</div>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-body">
+          <div class="tl-step">PHASE 04</div>
+          <div class="tl-title">Festival Screening - 27/03/2026</div>
+          <div class="tl-date">All selected films screened in front of a live audience and jury panel.</div>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-body">
+          <div class="tl-step">PHASE 05</div>
+          <div class="tl-title">Awards Ceremony - 27/03/2026</div>
+          <div class="tl-date">The night the winners are crowned. A cinematic evening to remember.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="submit">
+  <div class="submit-inner reveal">
+    <p class="section-label" style="text-align:center">// Ready to Roll?</p>
+    <h2 class="section-title" style="font-size:clamp(2.5rem,8vw,5.5rem)">Submit Your Film</h2>
+    <div class="divider" style="margin: 1.5rem auto"></div>
+    <p>Your story deserves to be on the big screen. Submit your short film today and join a community of passionate student filmmakers who dare to dream in moving pictures.</p>
+    <a href="https://forms.gle/EwHAWq5VmG9PRYxGA" target="_blank" class="btn btn-large">→ Submit via Google Form</a>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <p class="section-label">// Frequently Asked Questions</p>
+      <h2 class="section-title">Got Questions?</h2>
+      <div class="divider" style="margin: 1.5rem auto 0"></div>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Can films be in any language?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Yes! Films can be in any language. We only ask that you include English subtitles if the dialogue is not in English, so the jury and audience can fully appreciate your story.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Can one team submit multiple films?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Each registered team can submit only one film per entry. However, individual members can be part of different teams, each with their own unique film. Each submission requires a separate entry fee.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Is the entry fee refundable?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">The entry fee of ₹600 is non-refundable once submitted. We encourage all teams to carefully review their film and submission details before completing payment.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Can previously screened films be submitted?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Films that have been screened publicly are still eligible, as long as you hold the rights and the film was made after the eligibility date. Films must not have been screened at REJOUIR in a previous year.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What if my film has copyrighted music?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">You are fully responsible for clearing all music rights before submission. Films with unlicensed copyrighted music may be disqualified. We recommend using royalty-free or original compositions.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Will all submitted films be screened at the festival?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Not all submitted films will be screened. Our jury will curate an Official Selection. All submitting teams will be notified whether their film has been selected for screening.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">// Get in Touch</p>
+      <h2 class="section-title">Contact Us</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-card glass reveal">
+        <div class="contact-ico">📧</div>
+        <div class="contact-lbl">Email</div>
+        <div class="contact-val"><a href="mailto:rejouirshortfilm@gmail.com">rejouirshortfilm@gmail.com</a></div>
+      </div>
+      <div class="contact-card glass reveal">
+        <div class="contact-ico">📞</div>
+        <div class="contact-lbl">Phone / WhatsApp</div>
+        <div class="contact-val"><a href="tel:+919080253272">+91 90802 53272</a></div>
+      </div>
+      <div class="contact-card glass reveal">
+        <div class="contact-ico">📷</div>
+        <div class="contact-lbl">Instagram</div>
+        <div class="contact-val"><a href="https://instagram.com/rejouir_shortfilm" target="_blank">@rejouir_shortfilm</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">REJ<span>◉</span>UIR <span style="font-size:.7rem; color:var(--muted); letter-spacing:.1em">SHORT FILM FESTIVAL</span></div>
+      <div class="footer-copy">© 2025 REJOUIR — All Rights Reserved</div>
+      <div class="footer-socials">
+        <a href="https://instagram.com/rejouir_shortfilm" class="soc-link" title="Instagram" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="mailto:rejouirshortfilm@gmail.com" class="soc-link" title="Email">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </a>
+        <a href="https://wa.me/919080253272" class="soc-link" title="WhatsApp" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </a>
+      </div>
+      <!-- Designed by credit — styled to match footer typography -->
+      <div class="footer-credit">
+        Designed by
+        <span class="credit-brand">ED<span>◈</span>STIC Media</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleNav() {
+    document.getElementById('navLinks').classList.toggle('open');
+  }
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.getElementById('navLinks').classList.remove('open');
+    });
+  });
+
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        const siblings = e.target.parentElement.querySelectorAll('.reveal');
+        siblings.forEach((s, i) => {
+          s.style.transitionDelay = (i * 0.08) + 's';
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
